@@ -19,7 +19,6 @@ type Config struct {
 	AllowedOrigins      []string
 	RateLimitAttempts   int
 	RateLimitDuration   time.Duration
-	MaxFileSize         int64
 	SkippedApiEndpoints []string
 	TrustedProxies      []string
 	CookieDomain        string
@@ -49,10 +48,14 @@ type Config struct {
 	FrontendURL string
 
 	// cloudinary settings
-	CloudName   string
-	CloudSecret string
-	CloudApiKey string
-	CloudFolder string
+	CloudName            string
+	CloudSecret          string
+	CloudApiKey          string
+	CloudFolder          string
+	AllowedImageTypes    []string
+	AllowedVideoTypes    []string
+	AllowedDocumentTypes []string
+	MaxFileSize          map[string]int64
 
 	// google oauth settings
 	GoogleClientID      string
@@ -97,7 +100,6 @@ func LoadConfig() {
 		ApiKeys:             getEnvOrDefault("API_KEY", "your-api-keys"),
 		RateLimitAttempts:   getEnvAsInt("RATE_LIMIT_ATTEMPTS", 100),
 		RateLimitDuration:   getEnvAsDuration("RATE_LIMIT_DURATION", "60s"),
-		MaxFileSize:         getEnvAsInt64("MAX_FILE_SIZE", 12<<20),
 		TrustedProxies:      getEnvAsStringSlice("TRUSTED_PROXIES", []string{"localhost"}),
 		SkippedApiEndpoints: getEnvAsStringSlice("SKIPPED_API_ENDPOINTS", []string{"/health"}),
 		AllowedOrigins:      getEnvAsStringSlice("ALLOWED_ORIGINS", []string{"http://localhost:3000"}),
@@ -132,7 +134,6 @@ func LoadConfig() {
 		CloudApiKey: getEnvOrDefault("CLOUDINARY_API_KEY", "your-cloudinary-api-key"),
 		CloudFolder: getEnvOrDefault("CLOUDINARY_FOLDER", "asset_management_app"),
 	}
-
 	AppConfig.AllowedImageTypes = getEnvAsStringSlice("ALLOWED_IMAGE_TYPES", []string{"image/jpeg", "image/png"})
 	AppConfig.AllowedVideoTypes = getEnvAsStringSlice("ALLOWED_VIDEO_TYPES", []string{"video/mp4"})
 	AppConfig.AllowedDocumentTypes = getEnvAsStringSlice("ALLOWED_DOCUMENT_TYPES", []string{"application/pdf"})
@@ -142,7 +143,6 @@ func LoadConfig() {
 		"videos":    getEnvAsInt64("MAX_VIDEO_SIZE", 100<<20),   // 100MB
 		"documents": getEnvAsInt64("MAX_DOCUMENT_SIZE", 10<<20), // 10MB
 	}
-
 	fmt.Println("✅ Global configuration load complete")
 }
 
